@@ -27,6 +27,14 @@ app.use(express.json())
 connectDB()
 
 // Routes
+app.get('/', (req, res) => {
+  res.json({
+    status: 'success',
+    message: 'EliPay API is running',
+    version: '1.0.0'
+  })
+})
+
 app.use('/api/users', userRoutes)
 app.use('/api/accounts', accountRoutes)
 app.use('/api/transfers', transferRoutes)
