@@ -29,12 +29,12 @@ app.use((req, res, next) => {
 
 // Routes
 app.get('/', (req, res) => {
-  res.json({
-    status: 'success',
-    message: 'EliPay API is running',
-    version: '1.0.0',
-    timestamp: new Date().toISOString()
-  })
+  console.log('Root route hit!')
+  res.send('EliPay API is Live!')
+})
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' })
 })
 
 app.use('/api/users', userRoutes)
