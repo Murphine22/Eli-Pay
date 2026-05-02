@@ -15,17 +15,6 @@ const userSchema = new mongoose.Schema(
       trim: true
     },
 
-     failedLoginAttempts: {
-      type: Number,
-      default: 0
-    },
-
-    dob: {
-      type: String,
-      required: true,
-      trim: true
-    },
-
     // Contact
     email: {
       type: String,
@@ -45,7 +34,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 8,
-      select: false // 
+      select: false
     },
 
     // Verification
@@ -62,7 +51,7 @@ const userSchema = new mongoose.Schema(
     bvn: {
       type: String,
       unique: true,
-      sparse: true // allows null but enforces uniqueness when present
+      sparse: true
     },
 
     // Security
@@ -70,19 +59,19 @@ const userSchema = new mongoose.Schema(
       type: String,
       select: false
     },
-
     failedLoginAttempts: {
       type: Number,
       default: 0
     },
-
     isLocked: {
       type: Boolean,
       default: false
     },
-
   },
   {
     timestamps: true
   }
 );
+
+const User = mongoose.model("User", userSchema);
+export default User;

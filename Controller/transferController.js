@@ -32,10 +32,13 @@ export const transfer = async (req, res) => {
     const enquiry = await nameEnquiry(to);
 
     if (!enquiry || enquiry.status !== "success") {
-      throw new Error("Invalid destination account");
+      console.error("Name enquiry failed:", enquiry);
+      throw new Error("Invalid destination account - unable to verify recipient");
     }
+    
+    console.log("Name enquiry result:", enquiry);
 
-    const accountName = enquiry?.accountName;
+    const accountName = enquiry?.account?.accountName || enquiry?.accountName;
 
     // 4️⃣ Call NIBSS Transfer
     const transferResponse = await transferFunds({
@@ -44,29 +47,31 @@ export const transfer = async (req, res) => {
       amount
     });
 
-    if (transferResponse.status !== "success") {
-      throw new Error("Transfer failed");
+    if (!transferResponse || transferResponse.status !== "success") {
+      console.error("Transfer failed:", transferResponse);
+      throw new Error("Transfer failed - NIBSS transaction error");
     }
+    
+    console.log("Transfer response:", transferResponse);
 
     // 5️⃣ Debit sender
     senderAccount.balance -= amount;
     await senderAccount.save({ session });
 
-    // 6️⃣ Commit transaction
-    await session.commitTransaction();
-
-    // 7️⃣ Log transaction
-
-    const transaction = await Transaction.create({
+    // 6️⃣ Log transaction (before commit)
+    const transaction = await Transaction.create([{
         user: userId,
         fromAccount: senderAccount.accountNumber,
         toAccount: to,
         amount,
         type: "debit",
-        status: "Success",
+        status: "success",
         reference: transferResponse.reference,
         rawResponse: transferResponse
-      }, { session });
+      }], { session });
+
+    // 7️⃣ Commit transaction
+    await session.commitTransaction();
 
     return res.status(200).json({
       status: "success",
