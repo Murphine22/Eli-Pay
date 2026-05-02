@@ -12,7 +12,13 @@ const app = express()
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://elipay-banking.vercel.app',
+    'https://elipay-frontend.vercel.app',
+    process.env.FRONTEND_URL
+  ].filter(Boolean),
   credentials: true
 }))
 app.use(express.json())
