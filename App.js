@@ -15,16 +15,12 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'https://elipay-banking.vercel.app',
-    'https://elipay-frontend.vercel.app',
+    
     process.env.FRONTEND_URL
   ].filter(Boolean),
   credentials: true
 }))
 app.use(express.json())
-
-// Connect to MongoDB
-connectDB()
 
 // Routes
 app.get('/', (req, res) => {
@@ -39,12 +35,19 @@ app.use('/api/users', userRoutes)
 app.use('/api/accounts', accountRoutes)
 app.use('/api/transfers', transferRoutes)
 
-app.get('/hello', (req, res) => {
-  res.send('Hello')
-})
+// Connect to MongoDB
+const startServer = async () => {
+  try {
+    await connectDB()
+    
+    const PORT = process.env.PORT || 5000
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`)
+    })
+  } catch (error) {
+    console.error('Failed to connect to MongoDB:', error.message)
+    process.exit(1)
+  }
+}
 
-const PORT = process.env.PORT || 5000
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`)
-})
+startServer()
