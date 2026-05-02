@@ -15,54 +15,28 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
+    'https://elipay-banking.vercel.app',
+    'https://elipay-frontend.vercel.app',
     process.env.FRONTEND_URL
   ].filter(Boolean),
   credentials: true
 }))
 app.use(express.json())
 
-// Request logger
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`)
-  next()
-})
+// Connect to MongoDB
+connectDB()
 
 // Routes
-app.get('/', (req, res) => {
-  console.log('Root route hit!')
-  res.send('EliPay API is Live!')
-})
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' })
-})
-
 app.use('/api/users', userRoutes)
 app.use('/api/accounts', accountRoutes)
 app.use('/api/transfers', transferRoutes)
 
-// 404 Catch-all
-app.use((req, res) => {
-  console.log(`404: ${req.method} ${req.url}`)
-  res.status(404).json({
-    status: 'error',
-    message: `Route ${req.method} ${req.url} not found`
-  })
+app.get('/hello', (req, res) => {
+  res.send('Hello')
 })
 
-// Connect to MongoDB
-const startServer = async () => {
-  try {
-    await connectDB()
-    
-    const PORT = process.env.PORT || 5000
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`)
-    })
-  } catch (error) {
-    console.error('Failed to connect to MongoDB:', error.message)
-    process.exit(1)
-  }
-}
+const PORT = process.env.PORT || 5000
 
-startServer()
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`)
+})
