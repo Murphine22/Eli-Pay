@@ -22,18 +22,34 @@ app.use(cors({
 }))
 app.use(express.json())
 
+// Request logger
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`)
+  next()
+})
+
 // Routes
 app.get('/', (req, res) => {
   res.json({
     status: 'success',
     message: 'EliPay API is running',
-    version: '1.0.0'
+    version: '1.0.0',
+    timestamp: new Date().toISOString()
   })
 })
 
 app.use('/api/users', userRoutes)
 app.use('/api/accounts', accountRoutes)
 app.use('/api/transfers', transferRoutes)
+
+// 404 Catch-all
+app.use((req, res) => {
+  console.log(`404: ${req.method} ${req.url}`)
+  res.status(404).json({
+    status: 'error',
+    message: `Route ${req.method} ${req.url} not found`
+  })
+})
 
 // Connect to MongoDB
 const startServer = async () => {
